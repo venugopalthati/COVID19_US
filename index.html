@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<script src="//d3js.org/d3.v5.min.js"></script>
 <body>
   <h1>Hello Github Pages!</h1>
   <div>
@@ -8,8 +9,8 @@
     <button>Lowest</button>
 </div>
  <svg id="covid_viz"></svg>
-<script src="//d3js.org/d3.v3.min.js"></script>
+
 <script>
-  
+  data = await d3.csv("https://raw.githubusercontent.com/venugopalthati/COVID19_US/gh-pages/us_covid_cases.csv");
 </script>
 </body>
