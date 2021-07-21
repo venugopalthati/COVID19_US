@@ -35,7 +35,7 @@
     d3.select('svg').append('g')
     .attr('transform','translate('+50+','+50+')')
     .call(d3.axisBottom(x).ticks(20)
-      .tickFormat(d3.timeFormat("%m/%d/%Y")).tickValues(data.map(function(d) { return new Date(d.date)}) ));
+      .tickFormat(d3.timeFormat("%x")).tickValues(data.map(function(d) { return new Date(d.date)}) ));
 
     d3.select('svg').append('g')
     .attr('transform','translate('+50+','+450+')')
