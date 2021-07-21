@@ -23,8 +23,8 @@
     g.selectAll("circle")                      // plot a circle at each data location
       .data(data)
     .enter().append("circle")
-      .attr("cx", function(d) { return d.date; } )
-      .attr("cy", function(d) { return d.daily_cases; } )
+      .attr("cx", function(d) { return d["date"]; } )
+      .attr("cy", function(d) { return d["daily_cases"]; } )
       .attr("r", 5);
   }
   
