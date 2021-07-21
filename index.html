@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <script src="//d3js.org/d3.v5.min.js"></script>
-<body>
+<style> circle {fill: lightblue; stroke: black;} </style>
+<body onload='init()'>
   <h1>Hello Github Pages!</h1>
   <div>
     <button>First Case</button>
@@ -11,19 +12,21 @@
  <svg id="covid_viz"></svg>
 
 <script>
-  data = await d3.csv("https://raw.githubusercontent.com/venugopalthati/COVID19_US/gh-pages/us_covid_cases.csv");
-  
-  var svg = d3.select("svg")
-    .attr("width",  500)
-    .attr("height", 500)
-    .append("g");
-  
-  g.selectAll("circle")                      // plot a circle at each data location
-    .data(data)
-  .enter().append("circle")
-    .attr("cx", function(d) { return x(d.x); } )
-    .attr("cy", function(d) { return y(d.y); } )
-    .attr("r", 5);
+  async function init() {
+    data = await d3.csv("https://raw.githubusercontent.com/venugopalthati/COVID19_US/gh-pages/us_covid_cases.csv");
+
+    var svg = d3.select("svg")
+      .attr("width",  500)
+      .attr("height", 500)
+      .append("g");
+
+    g.selectAll("circle")                      // plot a circle at each data location
+      .data(data)
+    .enter().append("circle")
+      .attr("cx", function(d) { return x(d.x); } )
+      .attr("cy", function(d) { return y(d.y); } )
+      .attr("r", 5);
+  }
   
 </script>
 </body>
