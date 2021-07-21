@@ -17,14 +17,14 @@
 
     var svg = d3.select("svg")
       .attr("width",  500)
-      .attr("height", 500)
-      .append("g");
+      .attr("height", 500);
 
+    var g = svg.append("g");
     g.selectAll("circle")                      // plot a circle at each data location
       .data(data)
     .enter().append("circle")
-      .attr("cx", function(d) { return x(d.x); } )
-      .attr("cy", function(d) { return y(d.y); } )
+      .attr("cx", function(d) { return d.date; } )
+      .attr("cy", function(d) { return d.daily_cases; } )
       .attr("r", 5);
   }
   
