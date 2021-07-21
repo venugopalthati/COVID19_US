@@ -32,11 +32,11 @@
     
     d3.select('svg').append('g')
     .attr('transform','translate('+50+','+50+')')
-    .call(d3.axisBottom(x).ticks(20).
+    .call(d3.axisBottom(x).ticks(20)
       .tickFormat(d3.timeFormat("%Y-%m-%d")).tickValues(data.map(function(d) { return new Date(d.date)}) ));
 
     d3.select('svg').append('g')
-    .attr('transform','translate('+50+','+250+')')
+    .attr('transform','translate('+50+','+450+')')
     .call(d3.axisLeft(y).ticks(4));
     
     var svg = d3.select("svg")
