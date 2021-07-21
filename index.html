@@ -14,13 +14,38 @@
 <script>
   async function init() {
     data = await d3.csv("https://raw.githubusercontent.com/venugopalthati/COVID19_US/gh-pages/us_covid_cases.csv");
+    width = 500;
+    height = 500;
+    
+    var x = d3.scaleTime()
+    .domain(d3.extent(data, function(d) { 
+      return new Date(d.date); 
+    }))
+    .range([0, width]);
+    
+    var y = d3.scaleLinear()
+    .domain([0, d3.max(data, function(d){
+      var a = [d.daily_cases];
+      return d3.max(a)
+      })])
+    .range([height, 0]);
+    
+    d3.select('svg').append('g')
+    .attr('transform','translate('+50+','+50+')')
+    .call(d3.axisBottom(x).ticks(20).
+      .tickFormat(d3.timeFormat("%Y-%m-%d")).tickValues(data.map(function(d) { return new Date(d.date)}) ));
 
+    d3.select('svg').append('g')
+    .attr('transform','translate('+50+','+250+')')
+    .call(d3.axisLeft(y).ticks(4));
+    
     var svg = d3.select("svg")
-      .attr("width",  500)
-      .attr("height", 500);
+      .attr("width",  width)
+      .attr("height", height);
 
-    var g = svg.append("g");
-    g.selectAll("circle")                      // plot a circle at each data location
+    var g = svg.append("g")
+       .attr("transform","translate("+50+","+50+")")
+       .selectAll("circle")                      
       .data(data)
     .enter().append("circle")
       .attr("cx", function(d) { return d["date"]; } )
