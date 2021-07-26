@@ -32,15 +32,19 @@
 <body onload='init("1")'>
   <h1>COVID-19 Cases Trend in the USA</h1>
   <div>
-    <button onclick="init('1')">First Case</button>
-    <button onclick="init('2')">Peak</button>
-    <button onclick="init('3')">Lowest</button>
+    <button id="button_1" onclick="init('1')">First Case</button>
+    <button id="button_2" onclick="init('2')">Peak</button>
+    <button id="button_3" onclick="init('3')">Lowest</button>
 </div>
  <svg id="covid_viz" style="overflow: visible"></svg>
 
 <script>
   async function init(slide_num) {
     document.getElementById("covid_viz").innerHTML = "";
+    document.getElementById("button_1").style = "";
+    document.getElementById("button_2").style = "";
+    document.getElementById("button_3").style = "";
+
     data = await d3.csv("https://raw.githubusercontent.com/venugopalthati/COVID19_US/gh-pages/us_covid_cases.csv");
     var startDate = '';
     var endDate = '';
@@ -71,6 +75,7 @@
 
 
     if(slide_num == 1) {
+      document.getElementById("button_1").style = "font-weight : bold ;";
       startDate = '01/01/2020';
       endDate = '05/01/2020';
       svg.append('line')
@@ -95,6 +100,7 @@
         .text("CDC Reported First COVID-19 case on Jan 21, 2020");
 
     } else if (slide_num == 2) {
+      document.getElementById("button_2").style = "font-weight : bold ;";
       startDate = '01/01/2020';
       endDate = '02/01/2021';
 
@@ -120,6 +126,7 @@
         .text("Peak number of COVID-19 cases (300777) report on Jan 8, 2021");
 
     } else if (slide_num == 3) {
+      document.getElementById("button_3").style = "font-weight : bold ;";
       startDate = '01/01/2020';
       endDate = '08/01/2021';
 
