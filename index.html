@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.structure.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.theme.min.css">
+
 <script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+
 <style> /* set the CSS */
 
   .line {
@@ -18,8 +28,6 @@
   div.tooltip {	
     position: absolute;			
     text-align: left;			
-    width: 200px;					
-    height: 125px;					
     padding: 2px;				
     font: 12px sans-serif;		
     background: lightsteelblue;	
@@ -28,143 +36,343 @@
     pointer-events: none;			
 }
   
+
   </style>
-<body onload='init("1")'>
-  <h1>COVID-19 Cases Trend in the USA</h1>
+<body onload='init("1","N")' width="450">
+  <h1>COVID-19's Waves in the USA</h1>
   <div>
-    <button id="button_1" onclick="init('1')">First Case</button>
-    <button id="button_2" onclick="init('2')">Peak Cases</button>
-    <button id="button_3" onclick="init('3')">Lowest Cases</button>
+
+  </div>
+  <div>
+    <button id="button_1" onclick="init('1','N')">First Wave</button>
+    <button id="button_2" onclick="init('2','N')">Second Wave</button>
+    <button id="button_3" onclick="init('3','N')">Third Wave</button>
+    <button id="button_4" onclick="init('4','N')">Fourth Wave</button>
+    <button id="button_5" onclick="init('5','N')">Fifth Wave</button>
     &nbsp;
     &nbsp;
     &nbsp;
     &nbsp;
-    <tex id="text_1">Mouse over data points to see more details</button>
 </div>
+</br>
+</br>
+<div>
+  <text id="text_1">Mouse over data points to see more details</text>
+</div>
+
  <svg id="covid_viz" style="overflow: visible"></svg>
 
-<script>
-  async function init(slide_num) {
-    document.getElementById("covid_viz").innerHTML = "";
-    document.getElementById("button_1").style = "";
-    document.getElementById("button_2").style = "";
-    document.getElementById("button_3").style = "";
+ <br/>
+ <br/>
+ <div id="slider-div">
+  <label style="font-size: 15px; margin: 30px">Date: <span id="dateLabel1">01/01/2020</span> - <span id="dateLabel2">06/01/2021</span></label>
+  <div id="date-slider" style="max-width: 750px; margin: 40px"></div>
+</div>
 
-    data = await d3.csv("https://raw.githubusercontent.com/venugopalthati/COVID19_US/gh-pages/us_covid_cases.csv");
-    var startDate = '';
-    var endDate = '';
+<script>
+  var x="";
+  var y="";
+
+  var startDate = '';
+  var endDate = '';
+
+  var ustotalpopulation = 328000000;
+  var data_orig = "";
+
 
 
   var margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = 800 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
-    
-  var x = d3.scaleTime()
-    .domain([new Date("01/01/2020"),new Date("08/01/2021")])
-    .range([0, width]);
-    
-    var y = d3.scaleLinear()
-    .domain([0, 400000])
-    .range([height, 0]);
+      width = 800 - margin.left - margin.right,
+      height = 400 - margin.top - margin.bottom;
 
-    var div = d3.select("body").append("div")	
+  
+    const annotation_first = [
+    {
+      note: {
+        label: "First wave of COVID-19 was around April, 2020",
+        title: "",
+        wrap: 250,
+        padding: 20
+      },
+      connector: {
+        end: "dot",
+        endScale: 2,
+
+      },
+      color: ["grey"],
+      x: 120,
+      y: 300,
+      dy: -35,
+      dx: 15
+    }
+  ]
+
+  const annotation_second = [
+    {
+      note: {
+        label: "Second wave was approx. around July, 2020",
+        title: "",
+        wrap: 250,
+        padding: 20
+      },
+      connector: {
+        end: "dot",
+        endScale: 2,
+
+      },
+      color: ["grey"],
+      x: 240,
+      y: 260,
+      dy: -35,
+      dx: 15
+    }
+  ]
+
+
+  const annotation_third = [
+    {
+      note: {
+        label: "Third wave started around November, 2020 and lasted until end of January 2021",
+        title: "",
+        wrap: 250,
+        padding: 20
+      },
+      connector: {
+        end: "dot",
+        endScale: 2,
+
+      },
+      color: ["grey"],
+      x: 400,
+      y: 125,
+      dy: -35,
+      dx: -15
+    }
+  ]
+
+  const annotation_fourth = [
+    {
+      note: {
+        label: "Fourth wave was around the end of March 2021 but it lasted for small duration",
+        title: "",
+        wrap: 250,
+        padding: 20
+      },
+      connector: {
+        end: "dot",
+        endScale: 2,
+
+      },
+      color: ["grey"],
+      x: 570,
+      y: 250,
+      dy: -35,
+      dx: 15
+    }
+  ]
+
+
+  const annotation_fifth = [
+    {
+      note: {
+        label: "Fifth wave started around beginning of July 2021",
+        title: "",
+        wrap: 250,
+        padding: 20
+      },
+      connector: {
+        end: "dot",
+        endScale: 2,
+
+      },
+      color: ["grey"],
+      x: 700,
+      y: 300,
+      dy: -35,
+      dx: 15
+    }
+  ]
+
+  
+  var parseDate = d3.timeParse("%m/%d/%Y");
+  var formatTime = d3.timeFormat("%d/%m/%Y");
+
+
+  var minDate = new Date(parseDate("01/01/2020")).valueOf();
+  var maxDate = new Date(parseDate("07/31/2021")).valueOf();
+
+  //console.log(minDate);
+  //console.log(maxDate);
+
+  xticks = 20;
+
+  // Add jQuery UI slider
+  $("#date-slider").slider({
+      range: true,
+      min: minDate,
+      max: maxDate,
+      step: 86400000, // One day
+      values: [startDate, endDate],
+      slide: function(event, ui){
+          $("#dateLabel1").text(formatTime(new Date(ui.values[0])));
+          $("#dateLabel2").text(formatTime(new Date(ui.values[1])));
+          init("","Y");
+      }
+  });
+
+
+  var div = d3.select("body").append("div")	
     .attr("class", "tooltip")				
     .style("opacity", 0);
-    
-    var svg = d3.select("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
 
+  curr_slide_num = "";
+  
 
-    if(slide_num == 1) {
-      document.getElementById("button_1").style = "font-weight : bold ;";
-      startDate = '01/01/2020';
-      endDate = '05/01/2020';
-      svg.append('line')
-        .style("stroke", "GREY")
-        .style("stroke-width", 2)
-        .attr("x1", 25)
-        .attr("y1", 350)
-        .attr("x2", 50)
-        .attr("y2", 275);
-      
-      svg.append('circle')
-        .style("fill", "orange")
-        .attr("cx", 25)
-        .attr("cy", 350)
-        .attr("r", 6);
-
-      svg.append('text')
-        .style("fill", "grey")
-        .attr("x", 50)
-        .attr("y", 260)
-        .attr("font", 13)
-        .text("CDC Reported First COVID-19 case on Jan 21, 2020");
-
-    } else if (slide_num == 2) {
-      document.getElementById("button_2").style = "font-weight : bold ;";
-      startDate = '01/01/2020';
-      endDate = '02/01/2021';
-
-      svg.append('line')
-        .style("stroke", "GREY")
-        .style("stroke-width", 2)
-        .attr("x1", 472)
-        .attr("y1", 85)
-        .attr("x2", 497)
-        .attr("y2", 10);
-      
-      svg.append('circle')
-        .style("fill", "orange")
-        .attr("cx", 472)
-        .attr("cy", 85)
-        .attr("r", 6);
-
-      svg.append('text')
-        .style("fill", "grey")
-        .attr("x", 495)
-        .attr("y", 4)
-        .attr("font", 13)
-        .text("Peak number of COVID-19 cases (300777) report on Jan 8, 2021");
-
-    } else if (slide_num == 3) {
-      document.getElementById("button_3").style = "font-weight : bold ;";
-      startDate = '01/01/2020';
-      endDate = '08/01/2021';
-
-      svg.append('line')
-        .style("stroke", "GREY")
-        .style("stroke-width", 2)
-        .attr("x1", 695)
-        .attr("y1", 345)
-        .attr("x2", 720)
-        .attr("y2", 270);
-      
-      svg.append('circle')
-        .style("fill", "orange")
-        .attr("cx", 695)
-        .attr("cy", 345)
-        .attr("r", 6);
-
-      svg.append('text')
-        .style("fill", "grey")
-        .attr("x", 720)
-        .attr("y", 260)
-        .attr("font", 13)
-        .text("Lowest number of COVID-19 cases (3491) reported on July 4, 2021");
+  async function init(slide_num, slider) {
+    document.getElementById("covid_viz").innerHTML = "";
+    if(slide_num != "") {
+      curr_slide_num = slide_num;
     }
     
-    data = data.filter( function(d){ return (new Date(d.date) > new Date(startDate) && new Date(d.date) < new Date(endDate))} );
+    if(slider == 'N') {
+      document.getElementById("button_1").style = "";
+      document.getElementById("button_2").style = "";
+      document.getElementById("button_3").style = "";
+      document.getElementById("button_4").style = "";
+      document.getElementById("button_5").style = "";
+    }
+    
+    if(data_orig == "") {
+        data_orig = await d3.csv("https://raw.githubusercontent.com/venugopalthati/COVID19_US/gh-pages/us_covid_cases.csv");
+    }
+
+    if(slider == 'Y') {
+      // Filter data based on selections
+      var sliderValues = $("#date-slider").slider("values");
+
+      //console.log("using slider"+sliderValues);
+
+      startDate = sliderValues[0];
+      endDate = sliderValues[1];
+
+      /*minDate = startDate;
+      maxDate = endDate;*/
+
+      xticks = monthDiff(new Date(startDate), new Date(endDate));
+
+    } /*else {
+      minDate = new Date(parseDate("01/01/2020")).valueOf();
+      maxDate = new Date(parseDate("07/31/2021")).valueOf();
+    }*/
+
+    x = d3.scaleTime().
+    domain([new Date(minDate),new Date(maxDate)])
+    .range([0, width]);
+    
+    var max_daily_cases = d3.max(data_orig, function(d) { return +d.daily_cases;} );
+    max_daily_cases = ((max_daily_cases) / (ustotalpopulation)) * 100000;
+    y = d3.scaleLinear()
+      .domain([0, max_daily_cases])
+      .range([height, 0]);
+
+
+    var svg = d3.select("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
 
     svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).ticks(xticks)
+          .tickFormat(d3.timeFormat("%b-%y"))
+        );
+
+    svg.append("g")
+      .call(d3.axisLeft(y).ticks(5));
+
+
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Normalized per 100000 population");  
+
+    svg.append("text")             
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                            (height + margin.top + 20) + ")")
+      .style("text-anchor", "middle")
+      .text("Month and Year");
+
+    if(slider == 'N') {
+
+      if(curr_slide_num == 1) {
+        document.getElementById("button_1").style = "font-weight : bold ;";
+        startDate = '01/01/2020';
+        endDate = '06/01/2020';
+
+        const annotations_first_c = d3.annotation().annotations(annotation_first); 
+        svg.append("g").call(annotations_first_c);
+
+      } else if (curr_slide_num == 2) {
+        document.getElementById("button_2").style = "font-weight : bold ;";
+        startDate = '01/01/2020';
+        endDate = '09/30/2020';
+
+        const annotations_second_c = d3.annotation().annotations(annotation_second);
+        svg.append("g").call(annotations_second_c);
+
+      } else if (curr_slide_num == 3) {
+        document.getElementById("button_3").style = "font-weight : bold ;";
+        startDate = '01/01/2020';
+        endDate = '02/28/2021';
+
+        const annotations_third_c = d3.annotation().annotations(annotation_third);  
+        svg.append("g").call(annotations_third_c);
+
+      } else if (curr_slide_num == 4) {
+        document.getElementById("button_4").style = "font-weight : bold ;";
+        startDate = '01/01/2020';
+        endDate = '05/31/2021';
+
+        const annotation_fourth_c = d3.annotation().annotations(annotation_fourth);  
+        svg.append("g").call(annotation_fourth_c);
+
+
+      } else if (curr_slide_num == 5) {
+        document.getElementById("button_5").style = "font-weight : bold ;";
+        startDate = '01/01/2020';
+        endDate = '07/25/2021';
+
+        const annotation_fifth_c = d3.annotation().annotations(annotation_fifth); 
+        svg.append("g").call(annotation_fifth_c);
+      }
+      $("#date-slider").slider('values',0,new Date(startDate));
+      $("#date-slider").slider('values',1,new Date(endDate));
+
+      document.getElementById("dateLabel1").innerHTML=startDate;
+      document.getElementById("dateLabel2").innerHTML=endDate;
+
+    } 
+    //console.log("slider == "+slider);
+    
+
+  data = data_orig.filter( function(d){ return (new Date(d.date) > new Date(startDate) && new Date(d.date) < new Date(endDate))} );
+
+  svg.append("g")
       .selectAll("circle")                 
       .data(data)
       .enter().append("circle")
       .attr("cx", function(d) { return x(new Date(d.date)); })
-      .attr("cy", function(d) { return y(d.daily_cases); })
+      .attr("cy", function(d) { 
+        var cases = ((d.daily_cases) / (ustotalpopulation)) * 100000;
+        return y(cases); 
+      })
       .attr("r", 2)
       .attr("fill","steelblue")
       .on("mouseover",function onMouseOver(d, i) {
@@ -178,8 +386,6 @@
               +"<tr><td> Date: </td> <td>"  + d.date + "</td></tr>"  
               +"<tr><td> Cases on this day: " + "</td> <td>"  + d.daily_cases + "</td></tr>"  
               +"<tr><td> Total cases until this date: " + "</td><td>" + d.cases + "</td></tr>" 
-              +"<tr><td> Deaths on this day: " + "</td><td>" + d.daily_deaths + "</td></tr>" 
-              +"<tr><td> Total deaths until this date: " + "</td><td>" + d.deaths + "</td></tr>" 
               +"</table>")
               .style("left", (d3.event.pageX) + "px")		
               .style("top", (d3.event.pageY - 30) + "px");
@@ -194,25 +400,90 @@
       });
 
 
-    path = svg.append("path")
+    svg.append("path")
       .data([data])
       .attr("class", "line")
       .attr("d", 
           d3.line()
          .x(function(d) { return x(new Date(d.date)); })
-         .y(function(d) { return y(d.daily_cases); }));
-  
-    
-    svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x).ticks(20)
-          .tickFormat(d3.timeFormat("%b-%y"))
-        );
+         .y(function(d) { 
+          var cases = ((d.daily_cases) / (ustotalpopulation)) * 100000;
+          return y(cases); 
+        }));
+
+    svg.append("path")
+      .style("opacity", .8)
+      .data([data])
+      .attr("class", "redline")
+      .attr("d", 
+          d3.line()
+         .x(function(d) { return x(new Date(d.date)); })
+         .y(function(d) { 
+          var deaths = ((d.daily_deaths) / (ustotalpopulation)) * 100000;
+          return y(deaths); 
+        }));
+      /*.on("mouseover",function onMouseOver(d, i) {
+        d3.select(this).style("opacity", .9)
+      })
+      .on("mouseout",function onMouseOut(d, i) {
+        d3.select(this).style("opacity", .2)
+      });*/
+
 
     svg.append("g")
-      .call(d3.axisLeft(y).ticks(5));
+      .style("opacity", .8)
+      .selectAll("circle")                 
+      .data(data)
+      .enter().append("circle")
+      .attr("cx", function(d) { return x(new Date(d.date)); })
+      .attr("cy", function(d) { 
+        var deaths = ((d.daily_deaths) / (ustotalpopulation)) * 100000;
+        return y(deaths); 
+      })
+      .attr("r", 1)
+      .attr("fill","red")
+      .on("mouseover",function onMouseOver(d, i) {
+        /*d3.select(this.parentNode).style("opacity", .9)*/
+        d3.select(this).attr("fill", "steelblue").attr("r", 8).style("opacity", 1);
+
+        div.transition()		
+                .duration(200)		
+                .style("opacity", .8);		
+
+        div.html("<table>"
+              +"<tr><td> This line shows deaths in comparison to the number of cases</td></tr>"  
+              +"<tr><td> Date: </td> <td>"  + d.date + "</td></tr>"  
+              +"<tr><td> Deaths on this day: " + "</td><td>" + d.daily_deaths + "</td></tr>" 
+              +"<tr><td> Total deaths until this date: " + "</td><td>" + d.deaths + "</td></tr>" 
+              +"</table>")
+              .style("left", (d3.event.pageX) + "px")		
+              .style("top", (d3.event.pageY - 30) + "px");
+
+      })
+      .on("mouseout",function onMouseOut(d, i) {
+        /*d3.select(this.parentNode).style("opacity", .2)*/
+        d3.select(this).attr("fill", "red").attr("r", 2);
+	
+        div.transition()		
+            .duration(500)		
+            .style("opacity", 0);
+      });
+      
+
+    svg.selectAll(".connector-end")
+    .attr('stroke', "orange")
+    .attr('fill', "orange");
 
   }
+
+/* https://stackoverflow.com/questions/2536379/difference-in-months-between-two-dates-in-javascript */
+  function monthDiff(d1, d2) {
+    var months;
+    months = (d2.getFullYear() - d1.getFullYear()) * 12;
+    months -= d1.getMonth();
+    months += d2.getMonth();
+    return months <= 0 ? 0 : months;
+ }
   
 </script>
 </body>
