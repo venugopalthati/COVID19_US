@@ -11,7 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
 
-<style> /* set the CSS */
+<style> 
 
   .line {
     fill: none;
@@ -19,11 +19,6 @@
     stroke-width: 1px;
   }
 
-  .redline {
-    fill: none;
-    stroke: red;
-    stroke-width: 1px;
-  }
 
   div.tooltip {	
     position: absolute;			
@@ -37,7 +32,7 @@
 }
   
 
-  </style>
+</style>
 <body onload='init("1","N")' width="450">
   <h1>COVID-19's Waves in the USA</h1>
   <div>
@@ -55,10 +50,11 @@
     &nbsp;
 </div>
 </br>
-</br>
+
 <div>
   <text id="text_1">Mouse over data points to see more details</text>
 </div>
+</br>
 
  <svg id="covid_viz" style="overflow: visible"></svg>
 
@@ -197,12 +193,8 @@
   var parseDate = d3.timeParse("%m/%d/%Y");
   var formatTime = d3.timeFormat("%d/%m/%Y");
 
-
   var minDate = new Date(parseDate("01/01/2020")).valueOf();
   var maxDate = new Date(parseDate("07/31/2021")).valueOf();
-
-  //console.log(minDate);
-  //console.log(maxDate);
 
   xticks = 20;
 
@@ -249,21 +241,9 @@
     if(slider == 'Y') {
       // Filter data based on selections
       var sliderValues = $("#date-slider").slider("values");
-
-      //console.log("using slider"+sliderValues);
-
       startDate = sliderValues[0];
       endDate = sliderValues[1];
-
-      /*minDate = startDate;
-      maxDate = endDate;*/
-
-      //xticks = monthDiff(new Date(startDate), new Date(endDate));
-
-    } /*else {
-      minDate = new Date(parseDate("01/01/2020")).valueOf();
-      maxDate = new Date(parseDate("07/31/2021")).valueOf();
-    }*/
+    } 
 
     x = d3.scaleTime().
     domain([new Date(minDate),new Date(maxDate)])
@@ -359,9 +339,7 @@
       document.getElementById("dateLabel2").innerHTML=endDate;
 
     } 
-    //console.log("slider == "+slider);
     
-
   data = data_orig.filter( function(d){ return (new Date(d.date) > new Date(startDate) && new Date(d.date) < new Date(endDate))} );
 
   svg.append("g")
@@ -386,6 +364,8 @@
               +"<tr><td> Date: </td> <td>"  + d.date + "</td></tr>"  
               +"<tr><td> Cases on this day: " + "</td> <td>"  + d.daily_cases + "</td></tr>"  
               +"<tr><td> Total cases until this date: " + "</td><td>" + d.cases + "</td></tr>" 
+              +"<tr><td> Deaths on this day: " + "</td><td>" + d.daily_deaths + "</td></tr>" 
+              +"<tr><td> Total deaths until this date: " + "</td><td>" + d.deaths + "</td></tr>" 
               +"</table>")
               .style("left", (d3.event.pageX) + "px")		
               .style("top", (d3.event.pageY - 30) + "px");
@@ -411,63 +391,6 @@
           return y(cases); 
         }));
 
-    svg.append("path")
-      .style("opacity", .8)
-      .data([data])
-      .attr("class", "redline")
-      .attr("d", 
-          d3.line()
-         .x(function(d) { return x(new Date(d.date)); })
-         .y(function(d) { 
-          var deaths = ((d.daily_deaths) / (ustotalpopulation)) * 100000;
-          return y(deaths); 
-        }));
-      /*.on("mouseover",function onMouseOver(d, i) {
-        d3.select(this).style("opacity", .9)
-      })
-      .on("mouseout",function onMouseOut(d, i) {
-        d3.select(this).style("opacity", .2)
-      });*/
-
-
-    svg.append("g")
-      .style("opacity", .8)
-      .selectAll("circle")                 
-      .data(data)
-      .enter().append("circle")
-      .attr("cx", function(d) { return x(new Date(d.date)); })
-      .attr("cy", function(d) { 
-        var deaths = ((d.daily_deaths) / (ustotalpopulation)) * 100000;
-        return y(deaths); 
-      })
-      .attr("r", 1)
-      .attr("fill","red")
-      .on("mouseover",function onMouseOver(d, i) {
-        /*d3.select(this.parentNode).style("opacity", .9)*/
-        d3.select(this).attr("fill", "steelblue").attr("r", 8).style("opacity", 1);
-
-        div.transition()		
-                .duration(200)		
-                .style("opacity", .8);		
-
-        div.html("<table>"
-              +"<tr><td> This line shows deaths in comparison to the number of cases</td></tr>"  
-              +"<tr><td> Date: </td> <td>"  + d.date + "</td></tr>"  
-              +"<tr><td> Deaths on this day: " + "</td><td>" + d.daily_deaths + "</td></tr>" 
-              +"<tr><td> Total deaths until this date: " + "</td><td>" + d.deaths + "</td></tr>" 
-              +"</table>")
-              .style("left", (d3.event.pageX) + "px")		
-              .style("top", (d3.event.pageY - 30) + "px");
-
-      })
-      .on("mouseout",function onMouseOut(d, i) {
-        /*d3.select(this.parentNode).style("opacity", .2)*/
-        d3.select(this).attr("fill", "red").attr("r", 1);
-	
-        div.transition()		
-            .duration(500)		
-            .style("opacity", 0);
-      });
       
 
     svg.selectAll(".connector-end")
@@ -476,14 +399,6 @@
 
   }
 
-/* https://stackoverflow.com/questions/2536379/difference-in-months-between-two-dates-in-javascript */
-  function monthDiff(d1, d2) {
-    var months;
-    months = (d2.getFullYear() - d1.getFullYear()) * 12;
-    months -= d1.getMonth();
-    months += d2.getMonth();
-    return months <= 0 ? 0 : months;
- }
   
 </script>
 </body>
